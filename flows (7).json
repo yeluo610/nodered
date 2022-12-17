@@ -1,0 +1,604 @@
+[
+    {
+        "id": "972f86d7d577b101",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "获取页面信息",
+        "info": "",
+        "x": 170,
+        "y": 3300,
+        "wires": []
+    },
+    {
+        "id": "f45d66c2931f262c",
+        "type": "http in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "url": "getJSON",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 3400,
+        "wires": [
+            [
+                "645922513c314ed5",
+                "1cdf1aa7f7ad5919"
+            ]
+        ]
+    },
+    {
+        "id": "e7f562376508013d",
+        "type": "http response",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 950,
+        "y": 3400,
+        "wires": []
+    },
+    {
+        "id": "29332598ea35513b",
+        "type": "file in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": true,
+        "x": 660,
+        "y": 3400,
+        "wires": [
+            [
+                "e7f562376508013d"
+            ]
+        ]
+    },
+    {
+        "id": "645922513c314ed5",
+        "type": "debug",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "req.query",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 3280,
+        "wires": []
+    },
+    {
+        "id": "1cdf1aa7f7ad5919",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// 目录名字\nglobal.set(\"routeName\",msg.req.query.routeName)\nvar routeName=global.get(\"routeName\")\n// 文件名字\nglobal.set(\"itemName\",msg.req.query.itemName)\nvar itemName=global.get(\"itemName\")\n\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+routeName+\"/src/pages/\"+itemName+\".json\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 3400,
+        "wires": [
+            [
+                "29332598ea35513b"
+            ]
+        ]
+    },
+    {
+        "id": "0ef9143f549e4c70",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// json文件\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+global.get(\"routeName\")+\"/src/pages/site.json\"\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 3680,
+        "wires": [
+            [
+                "654c8deb40dcd497"
+            ]
+        ]
+    },
+    {
+        "id": "654c8deb40dcd497",
+        "type": "file in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 700,
+        "y": 3680,
+        "wires": [
+            [
+                "47eaa1c50e84b709"
+            ]
+        ]
+    },
+    {
+        "id": "47eaa1c50e84b709",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "\nvar json=global.get(\"itemName\")\n\n\nvar addnew='{\"label\": \"新增页面\",\"url\":\"/new\",\"icon\": \"fa fa-cube\",\"children\": [{\"label\":\"'+json+'\",\"url\":\"/new/'+json+'\",\"icon\": \"fa fa-list\",\"schemaApi\":\"get:./pages/'+json+'.json\"}]}'\n\n\nvar addnew2='{\"label\":\"'+json+'\",\"url\":\"/new/'+json+'\",\"icon\": \"fa fa-list\",\"schemaApi\":\"get:./pages/'+json+'.json\"}'\n\n\n\n\n// json化\nvar addnewJson=JSON.parse(addnew)\nvar addnewJson2=JSON.parse(addnew2)\n// 读取文件内容并且json化\nvar wholePage=msg.payload\nvar wholePageJson=JSON.parse(wholePage)\n// 如果存在新增页面，flag=1\nvar flags=wholePage.indexOf(\"新增页面\")!==-1\nif(flags){\n    var len=wholePageJson.data.pages.length\n    var children=wholePageJson.data.pages[len-1].children\n    // 如果label存在这个文件名，则不加入\n    var ifChong=children.some(item=>item.label==json)\n    if(!ifChong){\n        var newpages2=children.push(addnewJson2)\n    }\n    \n    \n    \n}else{\n    var pages=wholePageJson.data.pages\n    var newpages=pages.push(addnewJson)\n}\n\n// var obj={}\n// children = children.reduce((cur, next) => {\n//     obj[next.label] ? \"\" : obj[next.label] = true && cur.push(next);\n//     return cur;\n// }, [])\n\n\nmsg.payload=wholePageJson\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 3680,
+        "wires": [
+            [
+                "ec1ccf1b17db5d45"
+            ]
+        ]
+    },
+    {
+        "id": "4b7d7ee9533c77f2",
+        "type": "http response",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1390,
+        "y": 3780,
+        "wires": []
+    },
+    {
+        "id": "de28f0c535f3606d",
+        "type": "file",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 3680,
+        "wires": [
+            [
+                "8f25ac36f5c8c314"
+            ]
+        ]
+    },
+    {
+        "id": "ec1ccf1b17db5d45",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+global.get(\"routeName\")+\"/src/pages/site.json\"\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 3680,
+        "wires": [
+            [
+                "de28f0c535f3606d"
+            ]
+        ]
+    },
+    {
+        "id": "12d77898845f1232",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// 目录名字\nglobal.set(\"routeName\",msg.req.query.routeName)\nvar routeName=global.get(\"routeName\")\n// 文件名字\nglobal.set(\"itemName\",msg.req.query.itemName)\nvar itemName=global.get(\"itemName\")\n\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+routeName+\"/src/pages/\"+itemName+\".json\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 3840,
+        "wires": [
+            [
+                "c8f2e6ccf4d5f0e9"
+            ]
+        ]
+    },
+    {
+        "id": "c8f2e6ccf4d5f0e9",
+        "type": "file",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 540,
+        "y": 3840,
+        "wires": [
+            [
+                "0ef9143f549e4c70",
+                "a155c3bf057553f7"
+            ]
+        ]
+    },
+    {
+        "id": "a155c3bf057553f7",
+        "type": "debug",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 860,
+        "y": 3840,
+        "wires": []
+    },
+    {
+        "id": "4bda6f1d9512ed48",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "获取site.json文件和跨域",
+        "info": "",
+        "x": 450,
+        "y": 3640,
+        "wires": []
+    },
+    {
+        "id": "a63e8844af639428",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "将新文件的信息导入到site.json中",
+        "info": "",
+        "x": 880,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "f56bb8b6204eedae",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "将新的site文件重新写入",
+        "info": "",
+        "x": 1090,
+        "y": 3620,
+        "wires": []
+    },
+    {
+        "id": "72d21ed468a997f1",
+        "type": "http in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "url": "/postJSON",
+        "method": "post",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 221.765625,
+        "y": 3728.25,
+        "wires": [
+            [
+                "12d77898845f1232",
+                "608a77b3bc0f8901",
+                "ed047a483eeaa418"
+            ]
+        ]
+    },
+    {
+        "id": "608a77b3bc0f8901",
+        "type": "debug",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "req.query",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 190,
+        "y": 3860,
+        "wires": []
+    },
+    {
+        "id": "8f25ac36f5c8c314",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "msg.headers = {\"Access-Control-Allow-Origin\": global.get(\"origin\"), \n'Access-Control-Allow-Credentials':true, \n'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS', \n'Access-Control-Allow-Headers': 'Content-Type, X-Requested-With'}\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 3680,
+        "wires": [
+            [
+                "4b7d7ee9533c77f2"
+            ]
+        ]
+    },
+    {
+        "id": "ed047a483eeaa418",
+        "type": "debug",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "req.body",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 3520,
+        "wires": []
+    },
+    {
+        "id": "c151200179ed1619",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "用于自定义插件的",
+        "info": "",
+        "x": 230,
+        "y": 3640,
+        "wires": []
+    },
+    {
+        "id": "239a5136126d4510",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// json文件\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+global.get(\"routeName\")+\"/src/pages/site.json\"\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 4260,
+        "wires": [
+            [
+                "6b292f6a1f979550"
+            ]
+        ]
+    },
+    {
+        "id": "6b292f6a1f979550",
+        "type": "file in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 700,
+        "y": 4260,
+        "wires": [
+            [
+                "76ddbf3145303d4e"
+            ]
+        ]
+    },
+    {
+        "id": "f300823b2441dbc2",
+        "type": "http response",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1390,
+        "y": 4360,
+        "wires": []
+    },
+    {
+        "id": "39dfa20d18cd21fb",
+        "type": "file",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1240,
+        "y": 4260,
+        "wires": [
+            [
+                "4cb49b49a09a9fb0"
+            ]
+        ]
+    },
+    {
+        "id": "fc046c59e60b37a8",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+global.get(\"routeName\")+\"/src/pages/site.json\"\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 4260,
+        "wires": [
+            [
+                "39dfa20d18cd21fb"
+            ]
+        ]
+    },
+    {
+        "id": "68104851d0927fae",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// 目录名字\nglobal.set(\"routeName\",msg.req.query.routeName)\nvar routeName=global.get(\"routeName\")\n// 文件名字\nglobal.set(\"itemName\",msg.req.query.itemName)\nvar itemName=global.get(\"itemName\")\n\nmsg.filename=\"C:/Users/chanbaek/.node-red/uibuilder/\"+routeName+\"/src/pages/\"+itemName+\".json\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 4420,
+        "wires": [
+            [
+                "537ba6eb271574b4"
+            ]
+        ]
+    },
+    {
+        "id": "537ba6eb271574b4",
+        "type": "file",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "filename": "",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "delete",
+        "encoding": "none",
+        "x": 530,
+        "y": 4420,
+        "wires": [
+            [
+                "239a5136126d4510"
+            ]
+        ]
+    },
+    {
+        "id": "914fb40f6bdbacdc",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "获取site.json文件和跨域",
+        "info": "",
+        "x": 450,
+        "y": 4220,
+        "wires": []
+    },
+    {
+        "id": "7d79e160d3d379d2",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "将新文件的信息导入到site.json中",
+        "info": "",
+        "x": 880,
+        "y": 4320,
+        "wires": []
+    },
+    {
+        "id": "c3154b6fa96cb22b",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "将新的site文件重新写入",
+        "info": "",
+        "x": 1090,
+        "y": 4200,
+        "wires": []
+    },
+    {
+        "id": "4e70452247659922",
+        "type": "http in",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "url": "/deleteJSON",
+        "method": "delete",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 231.765625,
+        "y": 4308.25,
+        "wires": [
+            [
+                "68104851d0927fae"
+            ]
+        ]
+    },
+    {
+        "id": "4cb49b49a09a9fb0",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "msg.headers = {\"Access-Control-Allow-Origin\": global.get(\"origin\"), \n'Access-Control-Allow-Credentials':true, \n'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS', \n'Access-Control-Allow-Headers': 'Content-Type, X-Requested-With'}\nreturn msg;\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 4260,
+        "wires": [
+            [
+                "f300823b2441dbc2"
+            ]
+        ]
+    },
+    {
+        "id": "b1574f27ca06310e",
+        "type": "comment",
+        "z": "5df2cec25a4a63b8",
+        "name": "用于自定义插件的",
+        "info": "",
+        "x": 230,
+        "y": 4220,
+        "wires": []
+    },
+    {
+        "id": "76ddbf3145303d4e",
+        "type": "function",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "func": "// 1获取页面内容，json化\nvar json=global.get(\"itemName\")\nvar wholePage=msg.payload\nvar wholePageJson=JSON.parse(wholePage)\nvar len=wholePageJson.data.pages.length\n// 要判断children还在\nif(wholePageJson.data.pages[len-1].label==\"新增页面\"){\n    var children=wholePageJson.data.pages[len-1].children\n    var clen=children.length\n\n// 2 查看新增页面是否有这个label\n// 如果不为1，则单单删除那个对象就行了\nif(clen>1){\n    // clildren=children.filter(item =>item.label!=json)\n    // wholePageJson.data.pages[len-1].children=children\n    children.forEach((item, index, array) => {\n          if (item.label == json) {\n            array.splice(index, 1)\n          }\n        })\n}\n// 如果此时的children数量为1，则删除新增页面的所有,即删除pages的最后一个元素\nif(clen==1&&children[0].label==json){\n    wholePageJson.data.pages.pop()\n}\n    \n}\n\n\n\nmsg.payload=wholePageJson\n\n\nreturn msg;\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 4260,
+        "wires": [
+            [
+                "fc046c59e60b37a8",
+                "b671711dd8cb25e9"
+            ]
+        ]
+    },
+    {
+        "id": "b671711dd8cb25e9",
+        "type": "debug",
+        "z": "5df2cec25a4a63b8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 4380,
+        "wires": []
+    }
+]
