@@ -1,0 +1,8 @@
+adminAuth: {
+         type: "credentials",
+         users: [{
+             username: "admin",
+             password: "$2a$08$ygXUm7jUWiOUFUiOT9CxCefqgf.md8s1JyH3smtA1M6ASBPKGAutS",
+             permissions: "*"
+         }]
+      },
